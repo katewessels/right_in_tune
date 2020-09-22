@@ -83,15 +83,13 @@ The plots below show examples of frequency intensity displays over time of the c
 - Non-trainable params: 9,231,168
 
 
-
 #### Results:
 - Train Loss: 0.23 , Train Accuracy: 0.92
 - Validation Loss: 1.64, Validation Accuracy:0.65 
 - Test Loss: 2.45 , Test Accuracy: 0.62
 <img align='center' src="images/transfer_layer76.png" width="550" />
 
-<img slign='center' src="images/confusion_matrix_76.png" width="550" /> </br></br></br></br></br></br></br>
-</br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br></br>
+<img slign='center' src="images/confusion_matrix_76.png" width="550" /> 
 
 
 ## Models built from mfcc coefficients as features
@@ -123,13 +121,9 @@ The plots below show examples of frequency intensity displays over time of the c
 <img align='left' src="images/top20_rf_feature_importances.png" width="375" /> <img   src="images/top40_rf_feature_importances.png" width="375" />
 
 
-
-
 ## Conclusions
 - A Random Forest Classifer, trained with MFCC coefficients as audio features, can effectively be used classify audio data by instrument, with 94% accuracy. 
 - I believe a lot of my results are due to the quality of the MFCC feature data that I was able to use to train the Random Forest model, since I was able to use all the audio training samples (~300,000) with SMOTE sampling to balance classes. With the CNN models based on the MFCC images, on the other hand, I balanced classes by only sampling 2,000 images per class, so there wasn't nearly enough training data to make strong generalizations.
-
-
 
 
 ## Next Steps
