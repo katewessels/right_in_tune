@@ -3,18 +3,14 @@ import scipy.io.wavfile as wav
 from scipy.fftpack import dct
 import librosa
 import IPython.display as ipd
-# %matplotlib inline
 import matplotlib.pyplot as plt
 import librosa.display
 import soundfile
 import sklearn
 import shutil
-
 import pandas as pd
-import numpy as np
 from numpy import argmax
 import matplotlib.pyplot as plt
-# %matplotlib inline
 import librosa
 import librosa.display
 import IPython.display
@@ -24,67 +20,22 @@ import os
 from PIL import Image
 import pathlib
 import csv
-# sklearn Preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder
-#Keras
-import keras
 import warnings
 warnings.filterwarnings('ignore')
-from keras import layers
-from keras.layers import Activation, Dense, Dropout, Conv2D, Flatten, MaxPooling2D, GlobalMaxPooling2D, GlobalAveragePooling1D, AveragePooling2D, Input, Add
-from keras.models import Sequential
-from keras.optimizers import SGD
-from keras.utils import to_categorical
 import json
 import pickle
-from sklearn.naive_bayes import MultinomialNB
 from sklearn import preprocessing
 from sklearn.model_selection import KFold, train_test_split, cross_val_score, GridSearchCV
 from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_curve, classification_report, roc_auc_score, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier
 from imblearn.over_sampling import SMOTE
 
-def extract_mfcc_features(file_path):
-    audio, sr = librosa.load(file_path, res_type='kaiser_fast')
-    mfccs = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=40)
-    mfccs_processed = np.mean(mfccs.T, axis=0)
-    return mfccs_processed
-
-#get mfcc features for all files
-def get_all_features(df, audio_folder):
-    features = []
-    for item in df.index:
-        filename = item + '.wav'
-        data = extract_mfcc_features(f'{audio_folder}/{filename}')
-        class_label = df.loc[item]['instrument_family_str']
-        features.append([data, class_label, item])
-
-    featuresdf = pd.DataFrame(features, columns=['feature', 'class_label', 'item'])
-
-    featuresdf['class_label_num'] = featuresdf['class_label'].replace({
-                                    'bass': 0,
-                                    'brass': 1,
-                                    'flute': 2,
-                                    'guitar': 3,
-                                    'keyboard': 4,
-                                    'mallet': 5,
-                                    'organ': 6,
-                                    'reed': 7,
-                                    'string': 8,
-                                    'synth_lead': 9,
-                                    'vocal': 10})
-    X = np.array(featuresdf.feature.tolist())
-    y = np.array(featuresdf.class_label_num.tolist())
-    save_pickle_files(X, 'pickles/X.pkl')
-    save_pickle_files(y, 'pickles/y.pkl')
-    save_pickle_files(featuresdf, 'pickles/featuresdf.pkl')
-    return featuresdf, X, y
 
 def save_pickle_files(file_, file_path):
     with open(file_path, 'wb') as f:
-        # Write the model to a file.
         pickle.dump(file_, f)
     return None
 
@@ -92,6 +43,7 @@ def get_pickle_files(file_path):
     with open(file_path, 'rb') as f:
         file_ = pickle.load(f)
     return file_
+
 
 if __name__ == "__main__":
     #get mfcc feature data
@@ -113,6 +65,9 @@ if __name__ == "__main__":
     model = RandomForestClassifier(n_jobs=-1, random_state=1)
     model.fit(X_train, y_train)
 
+    #pickle model
+    save_pickle_files(model, 'pickles/rf_model.pkl')
+
     #test predict
     y_pred = model.predict(X_test)
     y_pred_proba = model.predict_proba(X_test)
@@ -124,7 +79,6 @@ if __name__ == "__main__":
     #classification report
     report = classification_report(y_test, y_pred)
 
-
     #training subset predict
     train_y_pred = model.predict(X_train)
     train_y_pred_proba = model.predict_proba(X_train)
@@ -133,50 +87,6 @@ if __name__ == "__main__":
     train_precision = precision_score(y_train, train_y_pred, average='macro')
     train_auc = roc_auc_score(y_train, train_y_pred_proba, multi_class='ovr')
 
-    # #feature importances
-    feat_scores_array = model.feature_importances_
-    feat_scores_df = pd.DataFrame({'Fraction of Samples Affected by Feature' : model.feature_importances_},
-                            index=tfidf_df.columns)
-    feat_scores = feat_scores_df.sort_values(by='Fraction of Samples Affected by Feature', ascending=False)
-
-    # #plot top 20 features
-    fig, ax = plt.subplots()
-    x_pos = np.arange(len(feat_scores[:20]))
-    ax.barh(x_pos, feat_scores['Fraction of Samples Affected by Feature'][:20], align='center')
-    plt.yticks(x_pos, feat_scores.index[:20])
-    ax.set_ylabel('MFCC Feature')
-    ax.set_xlabel('Fraction of Samples Affected')
-    ax.set_title('Top Feature Importances')
-    plt.gca().invert_yaxis()
-    plt.savefig('images/top30_feature_importances.png', bbox_inches = "tight")
-    # plt.show()
-
-    # Compute confusion matrix
-    cm = confusion_matrix(y_test, y_pred)
-    np.set_printoptions(precision=2)
-    # Plot confusion matrix
-    class_names = ['bass', 'brass', 'flute', 'guitar', 'keyboard', 'mallet',
-                    'organ', 'reed', 'string', 'synth_lead', 'vocal']
-    plot_confusion_matrix(cm, classes=class_names,
-                          title='Confusion Matrix', image_name=f'{unfreeze_layer}')
-
-    #plot confusion matrix
-    print("\n multilabel confusion matrix: \n", multilabel_confusion_matrix(y_test, y_pred, labels=[0,1]))
-    matrix = confusion_matrix(y_test, y_pred)
-    acc_per_class = matrix.diagonal()/matrix.sum(axis=0)
-    print('Accuracy per class:', acc_per_class)
-    plot_confusion_matrix(model, X_test, y_test)
-    plt.title('Multilabel Confusion Matrix')
-    plt.savefig('img_kate/confusion_matrix')
-    plt.show()
-
-    ###CROSS VALIDATE (default cv: stratified kfold (5-folds), which works for multi class)
-    # precision_scores = cross_val_score(model, scaled_tfidf_matrix, y_train, scoring=make_scorer(precision_score, average='macro'))
+    #cross validate, stratified kfold 5-folds
     accuracy_scores = cross_val_score(model, X_train, y_train, scoring='accuracy')
-    # recall_scores = cross_val_score(model, scaled_tfidf_matrix, y_train, scoring=make_scorer(recall_score, average='macro'))
-    # auc_scores = cross_val_score(model, scaled_tfidf_matrix, y_train, scoring='roc_auc_ovr')
-
-    # print(f'Training Mean CV Accuracy: {round(np.mean(accuracy_scores), 5)}')
-    # print(f'Training Mean CV Precision: {round(np.mean(precision_scores), 5)}')
-    # print(f'Training Mean CV Recall: {round(np.mean(recall_scores), 5)}')
-    # print(f'Training Mean CV AUC Score: {round(np.mean(auc_scores), 5)}')
+    print(f'Mean CV Accuracy: {round(np.mean(accuracy_scores), 5)}')

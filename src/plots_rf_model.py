@@ -6,8 +6,8 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_c
 from imblearn.over_sampling import SMOTE
 from collections import Counter
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix #, plot_confusion_matrix
-from plot_models import plot_learning_curves, plot_confusion_matrix
+from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix
+from plot_models import plot_confusion_matrix
 import seaborn as sns
 sns.set()
 
@@ -23,7 +23,19 @@ def get_pickle_files(file_path):
         file_ = pickle.load(f)
     return file_
 
-
+def plot_top_features(model, num_features, xlabel, ylabel, title, ax):
+    # feat_scores_array = model.feature_importances_
+    feat_scores_df = pd.DataFrame({'Fraction of Samples Affected by Feature' : model.feature_importances_},                )
+    feat_scores = feat_scores_df.sort_values(by='Fraction of Samples Affected by Feature', ascending=False)
+    x_pos = np.arange(len(feat_scores[:num_features]))
+    ax.barh(x_pos, feat_scores['Fraction of Samples Affected by Feature'][:num_features], align='center')
+    plt.yticks(x_pos, feat_scores.index[:num_features])
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    plt.gca().invert_yaxis()
+    plt.savefig(f'images/top{num_features}_rf_feature_importances.png', bbox_inches = "tight")
+    plt.show()
 
 if __name__ == "__main__":
 
@@ -45,8 +57,6 @@ if __name__ == "__main__":
     #get model
     model = get_pickle_files('pickles/rf_model.pkl')
 
-
-
     #test predict
     y_pred = model.predict(X_test)
     y_pred_proba = model.predict_proba(X_test)
@@ -66,35 +76,15 @@ if __name__ == "__main__":
     train_auc = roc_auc_score(y_train, train_y_pred_proba, multi_class='ovr')
 
 
-    # #feature importances
-    feat_scores_array = model.feature_importances_
-    feat_scores_df = pd.DataFrame({'Fraction of Samples Affected by Feature' : model.feature_importances_},
-                            )
-    feat_scores = feat_scores_df.sort_values(by='Fraction of Samples Affected by Feature', ascending=False)
 
-    # #plot top 40 features
+    #PLOT METRICS
+    #plot the 40 MFCC Features
     fig, ax = plt.subplots()
-    x_pos = np.arange(len(feat_scores[:40]))
-    ax.barh(x_pos, feat_scores['Fraction of Samples Affected by Feature'][:40], align='center')
-    plt.yticks(x_pos, feat_scores.index[:40])
-    ax.set_ylabel('MFCC Coefficients')
-    ax.set_xlabel('Fraction of Samples Affected')
-    ax.set_title('MFCC Coefficients by Importance')
-    plt.gca().invert_yaxis()
-    plt.savefig('images/top40_rf_feature_importances.png', bbox_inches = "tight")
-    plt.show()
+    plot_top_features(model, 40, 'Fraction of Samples Affected', 'MFCC Coefficients', 'MFCC Coefficients by Importance', ax=ax)
 
-    # #plot top 15 features
+    #plot the top 12 MFCC Features
     fig, ax = plt.subplots()
-    x_pos = np.arange(len(feat_scores[:15]))
-    ax.barh(x_pos, feat_scores['Fraction of Samples Affected by Feature'][:15], align='center')
-    plt.yticks(x_pos, feat_scores.index[:15])
-    ax.set_ylabel('MFCC Coefficients')
-    ax.set_xlabel('Fraction of Samples Affected')
-    ax.set_title('Top 15 MFCC Coefficients by Importance')
-    plt.gca().invert_yaxis()
-    plt.savefig('images/top20_rf_feature_importances.png', bbox_inches = "tight")
-    plt.show()
+    plot_top_features(model, 12, 'Fraction of Samples Affected', 'MFCC Coefficients', 'Top 12 MFCC Features by Importance', ax=ax)
 
     # Compute confusion matrix
     cm = confusion_matrix(y_test, y_pred)

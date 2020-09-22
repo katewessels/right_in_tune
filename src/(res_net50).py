@@ -37,7 +37,7 @@ from plot_models import plot_learning_curves, plot_confusion_matrix
 import seaborn as sns
 sns.set()
 from tensorflow.keras.applications.xception import preprocess_input
-from tensorflow.keras.applications import Xception
+from tensorflow.keras.applications import Xception, ResNet50
 from tensorflow.keras.models import Model
 import tensorflow as tf
 from tensorflow.python.keras import backend as k
@@ -47,7 +47,7 @@ from tensorflow.python.keras import backend as k
 def create_transfer_model(input_size, n_categories, weights='imagenet'):
         # base_model = keras.applications.xception.Xception(weights=weights,
         #                            include_top=False, input_shape=input_size) #layers=tf.keras.layers,
-        base_model = Xception(weights=weights,
+        base_model = ResNet50(weights=weights,
                             #   layers=tf.keras.layers,
                               include_top=False,
                               input_shape=input_size)
@@ -146,20 +146,20 @@ def train_transfer_model(train_generator, valid_generator, optimizer, callbacks,
     val_loss = history.history['accuracy']
     plot_accuracy_loss(acc, val_acc, loss, val_loss, list_of_axvline_values, unfreeze_layer)
     #pickle metrics and history (for next iteration)
-    save_pickle_files(acc, 'pickles/accuracy.pkl')
-    save_pickle_files(val_acc, 'pickles/val_accuracy.pkl')
-    save_pickle_files(loss, 'pickles/loss.pkl')
-    save_pickle_files(val_loss, 'pickles/val_loss.pkl')
+    save_pickle_files(acc, 'pickles/accuracy_resnet.pkl')
+    save_pickle_files(val_acc, 'pickles/val_accuracy_resnet.pkl')
+    save_pickle_files(loss, 'pickles/loss_resnet.pkl')
+    save_pickle_files(val_loss, 'pickles/val_loss_resnet.pkl')
     # save_pickle_files(history, 'pickles/history.pkl')
     # save_pickle_files(list_of_axvline_values, 'pickles/list_of_axvline_values.pkl')
     return history
 
 def fine_tune_model(unfreeze_layer, last_unfreeze_layer, train_generator, valid_generator, optimizer, callbacks, initial_epochs, list_of_axvline_values, fine_tune_epochs=50):
     #get past metrics
-    acc = get_pickle_files('pickles/accuracy.pkl')
-    val_acc = get_pickle_files('pickles/val_accuracy.pkl')
-    loss = get_pickle_files('pickles/loss.pkl')
-    val_loss = get_pickle_files('pickles/val_loss.pkl')
+    acc = get_pickle_files('pickles/accuracy_resnet.pkl')
+    val_acc = get_pickle_files('pickles/val_accuracy_resnet.pkl')
+    loss = get_pickle_files('pickles/loss_resnet.pkl')
+    val_loss = get_pickle_files('pickles/val_loss_resnet.pkl')
     # last_history = get_pickle_files('pickles/last_history.pkl')
     # list_of_axvline_values = get_pickle_files('pickles/list_of_axvline_values.pkl')
     # initial_epochs = last_history.epochs[-1]
@@ -169,21 +169,11 @@ def fine_tune_model(unfreeze_layer, last_unfreeze_layer, train_generator, valid_
     #set up epochs to accumulate for plotting
     total_epochs = initial_epochs + fine_tune_epochs
     #open saved transfer model
-    transfer_model_filepath=f'saved_models/best_transfer_model_{last_unfreeze_layer}.hdf5'
+    transfer_model_filepath=f'saved_models/best_transfer_model_resnet_{last_unfreeze_layer}.hdf5'
     transfer_model = tensorflow.keras.models.load_model(transfer_model_filepath)
     print(transfer_model.summary())
 
     change_trainable_layers(transfer_model, unfreeze_layer) #update trainable layers, block by block
-
-    # #added to unfreeze batchnormalized layers
-    # for layer in transfer_model.layers:
-    #     # layer.trainable = False
-    #     # if isinstance(layer, tf.keras.layers.BatchNormalization):
-    #     #     layer._per_input_updates = {}
-    #     # if "batch_normalization" in layer.__class__.__name__:
-    #     #     layer.trainable = True
-    #     if isinstance(layer, tf.keras.layers.BatchNormalization):
-    #         layer.trainable = True
 
     print_model_properties(transfer_model)
 
@@ -201,10 +191,10 @@ def fine_tune_model(unfreeze_layer, last_unfreeze_layer, train_generator, valid_
                         callbacks=callbacks
                         )
     #update metrics now + pickle updated version (for next iteration)
-    acc = update_metrics(acc, 'accuracy', history)
-    val_acc = update_metrics(val_acc, 'val_accuracy', history)
-    loss = update_metrics(loss, 'loss', history)
-    val_loss = update_metrics(val_loss, 'val_loss', history)
+    acc = update_metrics(acc, 'accuracy_resnet', history)
+    val_acc = update_metrics(val_acc, 'val_accuracy_resnet', history)
+    loss = update_metrics(loss, 'loss_resnet', history)
+    val_loss = update_metrics(val_loss, 'val_loss_resnet', history)
     #save history as pickle
     # save_pickle_files(history, 'pickles/history.pkl')
     # plot
@@ -216,8 +206,8 @@ if __name__ == "__main__":
     #GET DATA GENERATORS (put this into a class)
     #params
     batch_size = 32
-    img_height = 100
-    img_width = 100
+    img_height = 224
+    img_width = 224
     num_classes = 11
     #train set
     # train_data_dir = pathlib.Path('data/nsynth-train/train_images')
@@ -298,131 +288,37 @@ if __name__ == "__main__":
                      class_mode='sparse'
                      )
 
+    #create model and inspect layers
+    transfer_model = create_transfer_model((224, 224, 3), num_classes, weights='imagenet')
+    print_model_properties(transfer_model)
+
     #TRANSFER LEARNING MODEL
     # INSTANTIATE AND TRAIN TOP LAYER WEIGHTS
     # unfreeze_layer = 132
     # optimizer = tf.keras.optimizers.Adam(lr=0.01, beta_1 = 0.9, beta_2 = 0.999)
     # callbacks = [tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3,verbose=1),
-    #             tf.keras.callbacks.ModelCheckpoint(filepath=f'saved_models/best_transfer_model_{unfreeze_layer}.hdf5',
+    #             tf.keras.callbacks.ModelCheckpoint(filepath=f'saved_models/best_transfer_model_resnet_{unfreeze_layer}.hdf5',
     #                                     verbose=1, save_best_only=True, monitor='val_loss')]
+    # history = train_transfer_model(train_generator, valid_generator, optimizer, callbacks, unfreeze_layer, (224, 224, 3), num_classes)
 
-    # history = train_transfer_model(train_generator, valid_generator, optimizer, callbacks, unfreeze_layer, (100, 100, 3), num_classes)
 
     # #FINE TUNE MODEL, UNFREEZING ONE BLOCK OF LAYERS AT A TIME
-    unfreeze_layer = 76 #update these with each iteration
-    last_unfreeze_layer = 86 #update these with each iteration
-    initial_epochs= 49 #update with each iteration (history.epoch[-1] at end of last iteration)
-    list_of_axvline_values = [6, 16, 25, 36, 42, 49] #update w/ each iteration (append the initial_epoch)
+    # unfreeze_layer = 126 #update these with each iteration
+    # last_unfreeze_layer = 132 #update these with each iteration
+    # initial_epochs= 6 #update with each iteration (history.epoch[-1] at end of last iteration)
+    # list_of_axvline_values = [6] #update w/ each iteration (append the initial_epoch)
 
-    optimizer = tf.keras.optimizers.Adam(lr=0.00001, beta_1 = 0.9, beta_2 = 0.999)
-    callbacks = [tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=4,verbose=1),
-                tf.keras.callbacks.ModelCheckpoint(filepath=f'saved_models/best_transfer_model_{unfreeze_layer}.hdf5',
-                                        verbose=1, save_best_only=True, monitor='val_loss')]
-
-
-    history = fine_tune_model(unfreeze_layer, last_unfreeze_layer, train_generator, valid_generator, optimizer, callbacks, initial_epochs, list_of_axvline_values, fine_tune_epochs=50)
+    # optimizer = tf.keras.optimizers.Adam(lr=0.01, beta_1 = 0.9, beta_2 = 0.999)
+    # callbacks = [tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=4,verbose=1),
+    #             tf.keras.callbacks.ModelCheckpoint(filepath=f'saved_models/best_transfer_model_resnet_{unfreeze_layer}.hdf5',
+    #                                     verbose=1, save_best_only=True, monitor='val_loss')]
 
 
+    # history = fine_tune_model(unfreeze_layer, last_unfreeze_layer, train_generator, valid_generator, optimizer, callbacks, initial_epochs, list_of_axvline_values, fine_tune_epochs=50)
 
 
 
-    # ##INSTANTIATE TRANSFER MODEL
-    # transfer_model = create_transfer_model(input_size=(100,100,3), n_categories=num_classes)
-    # print_model_properties(transfer_model)
-    # change_trainable_layers(transfer_model, 132)
-    # print_model_properties(transfer_model)
 
-    # #TRAIN MODEL ON NEW DATA, LAYER BY LAYER
-    # #params
-    # unfreeze_layer = 132
-    # optimizer = tf.keras.optimizers.Adam(lr=0.001, beta_1 = 0.9, beta_2 = 0.999)
-    # callbacks = [
-    #     tf.keras.callbacks.EarlyStopping(monitor="val_loss",
-    #                                   patience=10,
-    #                                   verbose=1),
-    #     tf.keras.callbacks.ModelCheckpoint(filepath=f'saved_models/best_transfer_model{unfreeze_layer}.hdf5',
-    #                                     verbose=1, save_best_only=True, monitor='val_loss')
-    #             ]
-    # transfer_model.compile(optimizer=optimizer,
-    #               loss=tf.losses.SparseCategoricalCrossentropy(),
-    #               metrics=['accuracy'])
-
-    # history = transfer_model.fit(
-    #     train_generator,
-    #     validation_data=valid_generator,
-    #     epochs=50,
-    #     verbose=2,
-    #     callbacks=callbacks
-    #     )
-
-    # # # test_loss, test_accuracy = transfer_model.evaluate(test_generator)
-    # # # print('Test accuracy :', test_accuracy)
-    # #get metrics
-    # list_of_axvline_values = []
-    # acc = history.history['accuracy']
-    # val_acc = history.history['accuracy']
-    # loss = history.history['accuracy']
-    # val_loss = history.history['accuracy']
-    # plot_accuracy_loss(acc, val_acc, loss, val_loss, list_of_axvline_values, unfreeze_layer)
-
-    # #pickle metrics and history (for next iteration)
-    # save_pickle_files(acc, 'pickles/accuracy.pkl')
-    # save_pickle_files(val_acc, 'pickles/val_accuracy.pkl')
-    # save_pickle_files(loss, 'pickles/val_loss.pkl')
-    # save_pickle_files(val_loss, 'pickles/val_loss.pkl')
-    # save_pickle_files(history, 'pickles/history.pkl')
-    # save_pickle_files(list_of_axvline_values, 'pickles/list_of_axvline_values.pkl')
-
-    #FINE TUNE MODEL, LAYER BY LAYER
-
-
-
-    # #MAYBE CAN BREAK THIS APART FROM INITIAL MODEL
-    # last_unfreeze_layer=132 #update these w/ each iter
-    # unfreeze_layer = 116 #update these w/ each iter
-    # #get past metrics
-    # acc = get_pickle_files('pickles/accuracy.pkl')
-    # val_acc = get_pickle_files('pickles/val_accuracy.pkl')
-    # loss = get_pickle_files('pickles/loss.pkl')
-    # val_loss = get_pickle_files('pickles/val_loss.pkl')
-    # last_history = get_pickle_files('pickles/last_history.pkl')
-    # list_of_axvline_values = get_pickle_files('pickles/list_of_axvline_values.pkl')
-    # intitial_epochs = last_history.epochs[-1]
-    # list_of_axvline_values.append(initial_epochs)
-    # #save for next iter
-    # save_pickle_files(list_of_axvline_values, 'pickles/list_of_axvline_values.pkl')
-    # #set up epochs to accumulate for plotting
-    # fine_tune_epochs=50
-    # total_epochs = initial_epochs + fine_tune_epochs
-    # #open saved transfer model
-    # transfer_model_filepath=f'saved_models/best_transfer_model{last_unfreeze_layer}.hdf5'
-    # transfer_model = keras.models.load_model(transfer_model_filepath)
-    # print(transfer_model.summary())
-    # change_trainable_layers(transfer_model, unfreeze_layer) #update trainable layers, block by block
-    # print_model_properties(transfer_model)
-
-    # transfer_model.compile(optimizer=optimizer,
-    #                        loss=tf.losses.SparseCategoricalCrossentropy(),
-    #                        metrics=['accuracy'])
-
-    # history = transfer_model.fit(
-    #                     train_generator,
-    #                     validation_data=valid_generator,
-    #                     epochs=total_epochs,
-    #                     initial_epoch = initial_epochs,
-    #                     verbose=2,
-    #                     callbacks=callbacks
-    #                     )
-
-    # #update metrics now + pickle updated version (for next iteration)
-    # acc = update_metrics('accuracy', history)
-    # val_acc = update_metrics('val_accuracy', history)
-    # loss = update_metrics('loss', history)
-    # val_loss = update_metrics('val_loss', history)
-    # #save history as pickle
-    # save_pickle_files(history, 'pickles/history.pkl')
-    # # plot
-    # plot_accuracy_loss(acc, val_acc, loss, val_loss, list_of_axvline_values, unfreeze_layer)
 
 
 

@@ -100,38 +100,3 @@ if __name__ == "__main__":
     #split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=127)
 
-    # #initial model
-    # #params
-    # num_labels = 11
-    # batch_size = 32
-    # num_epochs = 100
-    # #instantiate
-    # model = Sequential()
-    # model.add(Flatten(input_shape=(40,)))
-    # model.add(Dense(256))
-    # model.add(Activation('relu'))
-    # model.add(Dropout(0.5))
-    # model.add(Dense(256))
-    # model.add(Activation('relu'))
-    # model.add(Dropout(0.5))
-    # model.add(Dense(num_labels))
-    # model.add(Activation('softmax'))
-    # #compile
-    # model.compile(loss='sparse_categorical_crossentropy', metrics=['accuracy'], optimizer='adam')
-
-    # #summary
-    # model.summary()
-
-    # # Calculate pre-training accuracy
-    # score = model.evaluate(X_test, y_test, verbose=0)
-    # print("Pre-training Accuracy: {0:.2%}".format(score[1]))
-
-    # #fit
-    # model.fit(X_train, y_train, batch_size=batch_size, epochs=num_epochs,
-    #         validation_data = (X_test, y_test), verbose=2)
-
-    # # Evaluate model on training and testing set
-    # score = model.evaluate(x_train, y_train, verbose=0)
-    # print("Training Accuracy: {0:.2%}".format(score[1]))
-    # score = model.evaluate(x_test, y_test, verbose=0)
-    # print("Testing Accuracy: {0:.2%}".format(score[1]))

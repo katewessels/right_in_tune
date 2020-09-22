@@ -25,7 +25,7 @@ import glob
 import shutil
 import keras
 from keras import layers
-from keras.layers import Activation, Dense, Dropout, Conv2D, Flatten, MaxPooling2D, GlobalMaxPooling2D, GlobalAveragePooling1D, AveragePooling2D, Input, Add
+from keras.layers import Activation, Dense, Dropout, Conv2D, Flatten, MaxPooling2D, GlobalMaxPooling2D, GlobalAveragePooling2D, GlobalAveragePooling1D, AveragePooling2D, Input, Add
 from keras.models import Sequential
 from keras.optimizers import SGD
 from datetime import datetime
@@ -102,17 +102,17 @@ test_generator = test_gen.flow_from_directory(
 
 ##TRAIN MODEL
 num_classes = 11
-
+num_channels = 4
 model = keras.models.Sequential([
         # keras.layers.experimental.preprocessing.Rescaling(1./255), #only if using datasets from directories
-        #keras.layers.experimental.preprocessing.Resizing(img_height, img_width),
-        keras.layers.Conv2D(32, 3, activation='relu'),
+        # keras.layers.experimental.preprocessing.Resizing(img_height, img_width),
+        keras.layers.Conv2D(32, 3, input_shape=(img_height, img_width, num_channels), activation='relu'),
         keras.layers.MaxPooling2D(),
         keras.layers.Conv2D(32, 3, activation='relu'),
         keras.layers.MaxPooling2D(),
         keras.layers.Conv2D(32, 3, activation='relu'),
         keras.layers.MaxPooling2D(),
-        keras.layers.Conv2D(32, 3, activation='relu'),
+        keras.layers.Conv2D(64, 3, activation='relu'),
         keras.layers.MaxPooling2D(),
         # keras.layers.Dropout(0.5),
         keras.layers.Flatten(),
@@ -120,6 +120,9 @@ model = keras.models.Sequential([
         keras.layers.Dropout(0.5),
         keras.layers.Dense(num_classes, activation='softmax')
         ])
+
+
+
 #compile
 optimizer = tf.keras.optimizers.Adam(lr=0.0001, beta_1 = 0.9, beta_2 = 0.999)
 model.compile(optimizer=optimizer,
@@ -132,17 +135,28 @@ callbacks = [
         # Stop training when `val_loss` is no longer improving
         monitor="val_loss",
         # "no longer improving" being defined as "no better than 1e-2 less"
-        min_delta=1e-2,
         # "no longer improving" being further defined as "for at least 3 epochs"
-        patience=3,
-        verbose=1,
-    )]
+        patience=10,
+        verbose=1),
+    # keras.callbacks.ModelCheckpoint(
+    #     # Path where to save the model
+    #     # The two parameters below mean that we will overwrite
+    #     # the current checkpoint if and only if
+    #     # the `val_loss` score has improved.
+    #     # The saved model name will include the current epoch.
+    #     filepath=f"saved_models/model_checkpoint_{epochs}",
+    #     save_best_only=True,  # Only save a model if `val_loss` has improved.
+    #     monitor="val_loss",
+    #     verbose=1)
+    ]
+
+
 
 #fit
 history = model.fit(
     train_generator,
     validation_data=valid_generator,
-    epochs=2,
+    epochs=100,
     verbose=2,
     callbacks=callbacks
     )
@@ -168,7 +182,7 @@ y_actual = test_generator.classes
 #PLOT RESULTS
 #plot learning curves
 fig, ax = plt.subplots(figsize=(8, 5))
-plot_learning_curves(history, 'trial2', ax=ax)
+plot_learning_curves(history, 'new_trial', ax=ax)
 
 # Compute confusion matrix
 cm = confusion_matrix(y_actual, y_preds)
@@ -177,5 +191,5 @@ np.set_printoptions(precision=2)
 # Plot confusion matrix
 class_names = ['bass', 'brass', 'flute', 'guitar', 'keyboard', 'mallet',
                 'organ', 'reed', 'string', 'synth_lead', 'vocal']
-plot_confusion_matrix(cm, classes=class_names,
+plot_confusion_matrix(cm, classes=class_names, image_name='trial3',
                       title='Confusion Matrix')

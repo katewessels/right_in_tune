@@ -160,7 +160,7 @@ y_actual = test_generator.classes
 
 #PLOT RESULTS
 #plot learning curves
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(15,7))
 plot_learning_curves(history, 'trial13', ax=ax)
 
 #compute confusion matrix

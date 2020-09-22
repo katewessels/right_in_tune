@@ -39,6 +39,8 @@ sns.set()
 from keras.applications.xception import preprocess_input
 from tensorflow.keras.applications import Xception
 from tensorflow.keras.models import Model
+#2nd iteration:
+# got rid fo preprocessing augmentation
 
 #GET DATA GENERATORS
 #params
@@ -50,13 +52,13 @@ num_classes = 11
 train_data_dir = pathlib.Path('data/nsynth-train/train_images')
 train_gen = tf.keras.preprocessing.image.ImageDataGenerator(
             preprocessing_function=preprocess_input,
-            horizontal_flip=True,
-            width_shift_range=3,
-            height_shift_range=3,
-            brightness_range=None,
-            shear_range=3,
-            zoom_range=3,
-            channel_shift_range=3,
+            # horizontal_flip=True,
+            # width_shift_range=3,
+            # height_shift_range=3,
+            # brightness_range=None,
+            # shear_range=3,
+            # zoom_range=3,
+            # channel_shift_range=3,
             # rescale=1./255
             )
 

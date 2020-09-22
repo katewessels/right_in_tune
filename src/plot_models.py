@@ -29,34 +29,37 @@ from keras.layers import Activation, Dense, Dropout, Conv2D, Flatten, MaxPooling
 from keras.models import Sequential
 from keras.optimizers import SGD
 from datetime import datetime
-from dumb_cnn import get_pickle_files, get_X_y
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix #, plot_confusion_matrix
+from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix
 import itertools
 import seaborn as sns
 sns.set()
 
 def plot_learning_curves(history, model_name, ax):
-    ax.plot(history.history['accuracy'], label='train_accuracy')
-    ax.plot(history.history['val_accuracy'], label='val_accuracy')
-    ax.plot(history.history['loss'], label='train_loss')
-    ax.plot(history.history['val_loss'], label='val_loss')
-    ax.grid(True)
-    ax.set_ylim(0,1)
-    ax.set_xlabel('Epochs', fontsize=14)
-    ax.set_title('Model Learning Curves', fontsize=16)
-    ax.legend(fontsize=14)
-    plt.savefig(f'images/{model_name}_learning_curve.png', bbox_inches='tight')
+    # plt.figure(figsize=(15,7))
+    #plot 1: accuracy
+    plt.subplot(1,2,1)
+    plt.plot(history.history['accuracy'], label='train')
+    plt.plot(history.history['val_accuracy'], label='validation')
+    plt.title('Accuracy', fontsize=16)
+    plt.xlabel('Epochs', fontsize=14)
+    plt.ylabel('Accuracy', fontsize=14)
+    plt.legend(fontsize=14)
+    #plot 2:loss
+    plt.subplot(1,2,2)
+    plt.plot(history.history['loss'], label='train')
+    plt.plot(history.history['val_loss'], label='validation')
+    plt.title('Loss', fontsize=16)
+    plt.xlabel('Epochs', fontsize=14)
+    plt.ylabel('Loss', fontsize=14)
+    plt.legend(fontsize=14)
+
+    plt.tight_layout()
+    plt.savefig(f'images/accuracy_loss{model_name}.png', bbox_inches='tight')
     plt.show()
 
 
-def plot_confusion_matrix(cm, classes,
-                          title='Confusion matrix',
-                          cmap=plt.cm.Blues):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
+def plot_confusion_matrix(cm, classes, title='Confusion Matrix', cmap=plt.cm.Blues):
     plt.figure()
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
@@ -69,11 +72,11 @@ def plot_confusion_matrix(cm, classes,
     plt.xlabel('Predicted label', fontsize=16)
     plt.title(title, fontsize=18)
 
-    thresh = cm.max() / 2.
+    # thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
         plt.text(j, i, cm[i, j],
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-
+                 horizontalalignment="center" #,
+                #  color="white" if cm[i, j] > thresh else "black"
+                )
     plt.savefig('images/confusion_matrix.png', bbox_inches='tight')
     plt.show()
