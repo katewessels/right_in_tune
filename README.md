@@ -25,17 +25,17 @@ See the plots below for the counts by instrument type and source and the distrib
 All the audio files I used were labeled with instrument type as well as pitch and velocity and were in .wav format. I used librosa, Python's module for audio and music processing to extract features from the audio files.
 I started by looking at some examples of the soundwaves produced by each of the different instrument classes.  You can see the amplitude of the wave over time, each audio clip 4 seconds long.
 
-<img align='center' src="images/class_waveforms.png" width="900" hspace="100"/>
+<img align='center' src="images/class_waveforms.png" width="1200" hspace="100"/>
 
 Python's librosa module makes it very easy to extract and visualize various features from audio time series data. Some early research indicated that the spectrogram of the audio data could be saved as an image and used to train a model related to music classification tasks. A spectrogram is a visual representation of the spectrum of frequencies of an audio signal over time. I specfically looked into the mel-frequency spectrogram, which is a spectrogram with frequencies in the mel scale, which is just a non-linear transformation of the frequency scale that is based on human perception of pitches. In audio classification tasks, it has been proven particularly useful to transform frequencies into the mel-scale, since this most closely is related to the way that we as humans perceive sound. See examples of mel-spectrograms from each instrument class below.
 
-<img align='center' src="images/class_melspecs.png" width="900" hspace="100"/>
+<img align='center' src="images/class_melspecs.png" width="1200" hspace="100"/>
 
 The last audio feature I looked at was Mel-frequency cepstral coefficients (MFCCs). A cepstral representation of an audio sample is a nonlinear "spectrum-of-a-spectrum" (hence the backwards name!), and is just one more unique way to represent the spectrum of a sound. A mel-frequency cepstrum (MFC) is a representation of that spectrum that is based on a linear cosine transform of a log power spectrum on a nonlinear mel-scale of frequency. Remember that the frequency bands on mel-scale approximate human audio processing more closely than other spaced freqency bands (such as linear), and that is why it is useful! And lastly, MFCCs are just the coefficients that collectively make up that MFC.  
 
 The plots below show examples of frequency intensity displays over time of the cepstral coefficients on a modified (mel) frequency scale. 
 
-<img align='center' src="images/class_mfccs.png" width="900" hspace="100"/>
+<img align='center' src="images/class_mfccs.png" width="1200" hspace="100"/>
 
 ## Models
 
@@ -69,7 +69,7 @@ The plots below show examples of frequency intensity displays over time of the c
 - Train Loss: 0.82, Train Accuracy: 0.71
 - Validation Loss: 1.07, Validation Accuracy: 0.64
 - Test Loss: 2.21, Test Accuracy: 0.51
-<img align='center' src="images/accuracy_loss12.png" width="850" />
+<img align='center' src="images/accuracy_loss12.png" width="1150" />
 
 <img slign='center' src="images/confusion_matrix_trial12.png" width="550" /> 
 
@@ -118,8 +118,8 @@ The plots below show examples of frequency intensity displays over time of the c
 
 - It is often assumed that the first 12 MFCC coefficients capture most of the sound qualities that humans can hear.  This model used the first 40 MFCC coefficients.  The plots below show that while the first 12 MFCC coefficients were the most influential to the model's predictions, the remaining coefficients, 12-39, also had some influence on predictions, each affecting at least 1.5% of the samples, which is significant, when compared to several of the first 12 coefficients, which affected between 2 and 3% of the samples.  
 
-<img align='center' src="images/top12_rf_feature_importances.png" width="375" /> 
-<img align='center'  src="images/40mfccfeatures.png" width="375" />
+<img align='center' src="images/top12_rf_feature_importances.png" width="550" /> 
+<img align='center'  src="images/40mfccfeatures.png" width="550" />
 
 
 ## Conclusions
