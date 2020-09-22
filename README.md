@@ -92,15 +92,15 @@ The plots below show examples of frequency intensity displays over time of the c
 <img slign='center' src="images/confusion_matrix_76.png" width="550" /> 
 
 
-## Models built from mfcc coefficients as features
+## Models built from MFCC coefficients as features
 - My next modeling technique was to extract the MFCCs for each audio file in an array and use these coefficients as features to train a model.
 ### Feature collection
 - Extracted 40 MFCC coefficients from each 173-frame audio file using librosa
 - For each audio file, took the mean value of each MFCC coeficient
-- Transformed the coefficients into a numpy array with shape, (300000, 40), and got the corresponding instrument labels in an array (300000,).
+- Transformed the coefficients into a numpy array with shape, (289205, 40), and got the corresponding instrument labels in an array (2892050,).
 - Train-test-split: 20% set aside test set
-- Balanced training data using SMOTE sampling method
-- After SMOTE, training feature matrix shape: (576829, 40)
+- Balanced training data classes using SMOTE sampling method
+- After SMOTE sampling, training feature matrix shape: (576829, 40)
 
 ### Random Forest Classifier
 - Hyper Parameters: 100 trees, max features= square root of # of features, no max depth, gini impurty as split criterion
@@ -118,7 +118,8 @@ The plots below show examples of frequency intensity displays over time of the c
 
 - It is often assumed that the first 12 MFCC coefficients capture most of the sound qualities that humans can hear.  This model used the first 40 MFCC coefficients.  The plots below show that while the first 12 MFCC coefficients were the most influential to the model's predictions, the remaining coefficients, 12-39, also had some influence on predictions, each affecting at least 1.5% of the samples, which is significant, when compared to several of the first 12 coefficients, which affected between 2 and 3% of the samples.  
 
-<img align='left' src="images/top20_rf_feature_importances.png" width="375" /> <img   src="images/top40_rf_feature_importances.png" width="375" />
+<img align='center' src="images/top12_rf_feature_importances.png" width="375" /> 
+<img align='center'  src="images/40mfccfeatures.png" width="375" />
 
 
 ## Conclusions
