@@ -7,7 +7,6 @@ from imblearn.over_sampling import SMOTE
 from collections import Counter
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import multilabel_confusion_matrix, confusion_matrix
-# from plot_models import plot_confusion_matrix
 import seaborn as sns
 sns.set()
 import itertools

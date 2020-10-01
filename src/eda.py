@@ -102,7 +102,6 @@ if __name__ == "__main__":
     ax.set_title('Audio Sample Instrument Counts by Source Type', fontsize=16)
     ax.legend(fontsize=16)
     plt.savefig('images/instrument_by_source.png', bbox_inches='tight')
-    plt.show()
 
     #plot audio samples by pitch
     fig, ax = plt.subplots(figsize=(12,8))
