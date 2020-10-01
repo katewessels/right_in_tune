@@ -3,18 +3,13 @@ import scipy.io.wavfile as wav
 from scipy.fftpack import dct
 import librosa
 import IPython.display as ipd
-# %matplotlib inline
 import matplotlib.pyplot as plt
 import librosa.display
 import soundfile
 import sklearn
 import shutil
-
 import pandas as pd
-import numpy as np
 from numpy import argmax
-import matplotlib.pyplot as plt
-# %matplotlib inline
 import librosa
 import librosa.display
 import IPython.display
@@ -24,20 +19,11 @@ import os
 from PIL import Image
 import pathlib
 import csv
-# sklearn Preprocessing
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder
-#Keras
-import keras
 import warnings
 warnings.filterwarnings('ignore')
-from keras import layers
-from keras.layers import Activation, Dense, Dropout, Conv2D, Flatten, MaxPooling2D, GlobalMaxPooling2D, GlobalAveragePooling1D, AveragePooling2D, Input, Add
-from keras.models import Sequential
-from keras.optimizers import SGD
-from keras.utils import to_categorical
-from comet_ml import Experiment
 import json
 
 #to get mfcc features for a single file

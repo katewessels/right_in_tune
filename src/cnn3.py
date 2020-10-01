@@ -143,7 +143,6 @@ model.compile(optimizer=optimizer,
 
 callbacks = [
     tf.keras.callbacks.EarlyStopping(
-            # Stop training when `val_loss` is no longer improving
             monitor="val_loss",
             patience=20,
             verbose=1
@@ -160,7 +159,7 @@ history = model.fit(
 print(model.summary())
 
 #save model to an HDF5 file
-saved_model_path = "./saved_models/cnn_arc3_13.h5".format(datetime.now().strftime("%m%d")) # _%H%M%S
+saved_model_path = "./saved_models/cnn_arc3_13.h5"
 model.save(saved_model_path)
 
 # #to open a saved model
@@ -187,4 +186,4 @@ np.set_printoptions(precision=2)
 #plot confusion matrix
 class_names = ['bass', 'brass', 'flute', 'guitar', 'keyboard', 'mallet',
                 'organ', 'reed', 'string', 'synth_lead', 'vocal']
-plot_confusion_matrix(cm, classes=class_names, title='Confusion Matrix', image_name='trial13')
+plot_confusion_matrix(cm, classes=class_names, model_name='trial13', title='Confusion Matrix')

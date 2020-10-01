@@ -18,7 +18,7 @@ import pathlib
 import csv
 import scipy.io.wavfile as wavfile
 from scipy.fftpack import dct
-
+import shutil
 
 def get_mfccs(path_to_audio_folder, path_to_image_folder):
     for filename in os.listdir(path_to_audio_folder):
@@ -65,33 +65,44 @@ def flatten_directory(dir_to_flatten):
 
 
 if __name__ == "__main__":
-    #GET MFCC IMAGES FROM AUDIO FILES
-    #create image folder "train_images"
-    pathlib.Path('data/nsynth-train/train_images').mkdir(parents=True, exist_ok=True)
-    #get train mfcc images in "train_images" folder
-    get_mfccs('data/nsynth-train/audio', 'data/nsynth-train/train_images')
-    # train_audio_count, train_image_count = count_images('data/nsynth-train/audio', 'data/nsynth-train/train_images')
-    #create image folder "valid_images"
-    pathlib.Path('data/nsynth-valid/valid_images').mkdir(parents=True, exist_ok=True)
-    # get valid mfcc images in "valid_images" folder
-    get_mfccs('data/nsynth-valid/audio', 'data/nsynth-valid/valid_images')
-    # valid_audio_count, valid_image_count = count_images('data/nsynth-valid/audio', 'data/nsynth-valid/valid_images')
-
-    #create image folder "test_images"
-    pathlib.Path('data/nsynth-test/test_images').mkdir(parents=True, exist_ok=True)
-    #get test mfcc images in "test_images" folder
-    get_mfccs('data/nsynth-test/audio', 'data/nsynth-test/test_images')
-    # test_audio_count, test_image_count = count_images('data/nsynth-test/audio', 'data/nsynth-test/test_images')
-
-    #MOVE MFCC IMAGES INTO LABELED CLASS FOLDERS
-    #train
-    train_image_folder = '/Users/katewessels/Documents/capstones/right_in_tune/data/nsynth-train/train_images'
-    move_images_to_class_folders(train_image_folder, file_limit=True)
-    #valid
-    valid_image_folder = '/Users/katewessels/Documents/capstones/right_in_tune/data/nsynth-valid/valid_images'
-    move_images_to_class_folders(valid_image_folder)
-    #test
-    test_image_folder = '/Users/katewessels/Documents/capstones/right_in_tune/data/nsynth-test/test_images'
-    move_images_to_class_folders(test_image_folder)
 
 
+    # #GET MFCC IMAGES FROM AUDIO FILES
+    # #create image folder "train_images"
+    # pathlib.Path('data/nsynth-train/train_images').mkdir(parents=True, exist_ok=True)
+    # #get train mfcc images in "train_images" folder
+    # get_mfccs('data/nsynth-train/audio', 'data/nsynth-train/train_images')
+    # # train_audio_count, train_image_count = count_images('data/nsynth-train/audio', 'data/nsynth-train/train_images')
+    # #create image folder "valid_images"
+    # pathlib.Path('data/nsynth-valid/valid_images').mkdir(parents=True, exist_ok=True)
+    # # get valid mfcc images in "valid_images" folder
+    # get_mfccs('data/nsynth-valid/audio', 'data/nsynth-valid/valid_images')
+    # # valid_audio_count, valid_image_count = count_images('data/nsynth-valid/audio', 'data/nsynth-valid/valid_images')
+
+    # #create image folder "test_images"
+    # pathlib.Path('data/nsynth-test/test_images').mkdir(parents=True, exist_ok=True)
+    # #get test mfcc images in "test_images" folder
+    # get_mfccs('data/nsynth-test/audio', 'data/nsynth-test/test_images')
+    # # test_audio_count, test_image_count = count_images('data/nsynth-test/audio', 'data/nsynth-test/test_images')
+
+    # #MOVE MFCC IMAGES INTO LABELED CLASS FOLDERS
+    # #train
+    # train_image_folder = '/Users/katewessels/Documents/capstones/right_in_tune/data/nsynth-train/train_images'
+    # move_images_to_class_folders(train_image_folder, file_limit=True)
+    # #valid
+    # valid_image_folder = '/Users/katewessels/Documents/capstones/right_in_tune/data/nsynth-valid/valid_images'
+    # move_images_to_class_folders(valid_image_folder)
+    # #test
+    # test_image_folder = '/Users/katewessels/Documents/capstones/right_in_tune/data/nsynth-test/test_images'
+    # move_images_to_class_folders(test_image_folder)
+
+
+    #RERUN THROUGH THESE STEPS FOR 'ALL' IMAGES TRAINING SET
+    # #get train_images_new folder
+    # pathlib.Path('data/nsynth-train/train_images_new').mkdir(parents=True, exist_ok=True)
+    # #get train mfcc images in "train_images" folder
+    # get_mfccs('data/nsynth-train/audio', 'data/nsynth-train/train_images_new')
+
+    # #get mfcc images into labeled class folders
+    # train_image_folder = 'data/nsynth-train/train_images_new'
+    # move_images_to_class_folders(train_image_folder)

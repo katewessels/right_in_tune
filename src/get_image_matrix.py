@@ -17,7 +17,6 @@ from scipy.fftpack import dct
 from sklearn.model_selection import train_test_split
 import keras
 import tensorflow as tf
-# from tensorflow.keras import layers
 import warnings
 warnings.filterwarnings('ignore')
 from keras import layers

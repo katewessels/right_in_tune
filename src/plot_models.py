@@ -59,8 +59,14 @@ def plot_learning_curves(history, model_name, ax):
     plt.show()
 
 
-def plot_confusion_matrix(cm, classes, title='Confusion Matrix', cmap=plt.cm.Blues):
+def plot_confusion_matrix(cm, classes, model_name, title='Confusion Matrix', normalize=False, cmap=plt.cm.Blues):
     plt.figure()
+
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        fmt = '.2f'
+    else:
+        fmt = 'd'
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
     plt.colorbar()
@@ -71,12 +77,13 @@ def plot_confusion_matrix(cm, classes, title='Confusion Matrix', cmap=plt.cm.Blu
     plt.ylabel('True label', fontsize=16)
     plt.xlabel('Predicted label', fontsize=16)
     plt.title(title, fontsize=18)
+    plt.grid(False)
 
-    # thresh = cm.max() / 2.
+    thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, cm[i, j],
-                 horizontalalignment="center" #,
-                #  color="white" if cm[i, j] > thresh else "black"
+        plt.text(j, i, format(cm[i, j], fmt),
+                horizontalalignment="center",
+                color="white" if cm[i, j] > thresh else "black"
                 )
-    plt.savefig('images/confusion_matrix.png', bbox_inches='tight')
+    plt.savefig(f'images/confusion_matrix_{model_name}.png', bbox_inches='tight')
     plt.show()

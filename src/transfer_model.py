@@ -84,7 +84,7 @@ def plot_accuracy_loss(acc, val_acc, loss, val_loss, list_of_axvline_values, fig
     plt.ylabel('Accuracy', fontsize=14)
     if list_of_axvline_values != []:
         for num in list_of_axvline_values:
-            plt.axvline(num-1, color='green', label='Fine Tuning Iterations')
+            plt.axvline(num-1, color='green')
     plt.legend(fontsize=14)
     plt.title('Training and Validation Accuracy', fontsize=14)
     #loss subplot
@@ -95,7 +95,7 @@ def plot_accuracy_loss(acc, val_acc, loss, val_loss, list_of_axvline_values, fig
     plt.ylabel('Cross Entropy', fontsize=14)
     if list_of_axvline_values != []:
         for num in list_of_axvline_values:
-            plt.axvline(num-1, color='green', label='Fine Tuning Iterations')
+            plt.axvline(num-1, color='green')
     plt.legend(fontsize=14)
     plt.title('Training and Validation Loss', fontsize=14)
     plt.xlabel('epoch', fontsize=14)
@@ -141,9 +141,9 @@ def train_transfer_model(train_generator, valid_generator, optimizer, callbacks,
     #get metrics
     list_of_axvline_values = []
     acc = history.history['accuracy']
-    val_acc = history.history['accuracy']
-    loss = history.history['accuracy']
-    val_loss = history.history['accuracy']
+    val_acc = history.history['val_accuracy']
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
     plot_accuracy_loss(acc, val_acc, loss, val_loss, list_of_axvline_values, unfreeze_layer)
     #pickle metrics and history (for next iteration)
     save_pickle_files(acc, 'pickles/accuracy.pkl')
@@ -246,21 +246,23 @@ if __name__ == "__main__":
     #TRANSFER LEARNING MODEL
     # INSTANTIATE AND TRAIN TOP LAYER WEIGHTS
     # unfreeze_layer = 132
-    # optimizer = tf.keras.optimizers.Adam(lr=0.01, beta_1 = 0.9, beta_2 = 0.999)
+    # optimizer = tf.keras.optimizers.Adam(lr=0.001, beta_1 = 0.9, beta_2 = 0.999)
     # callbacks = [tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3,verbose=1),
     #             tf.keras.callbacks.ModelCheckpoint(filepath=f'saved_models/best_transfer_model_{unfreeze_layer}.hdf5',
     #                                     verbose=1, save_best_only=True, monitor='val_loss')]
 
     # history = train_transfer_model(train_generator, valid_generator, optimizer, callbacks, unfreeze_layer, (100, 100, 3), num_classes)
 
-    # #FINE TUNE MODEL, UNFREEZING ONE BLOCK OF LAYERS AT A TIME
-    unfreeze_layer = 76 #update these with each iteration
-    last_unfreeze_layer = 86 #update these with each iteration
-    initial_epochs= 49 #update with each iteration (history.epoch[-1] at end of last iteration)
-    list_of_axvline_values = [6, 16, 25, 36, 42, 49] #update w/ each iteration (append the initial_epoch)
 
-    optimizer = tf.keras.optimizers.Adam(lr=0.00001, beta_1 = 0.9, beta_2 = 0.999)
-    callbacks = [tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=4,verbose=1),
+
+    # # #FINE TUNE MODEL, UNFREEZING ONE BLOCK OF LAYERS AT A TIME
+    unfreeze_layer =  86 #update these with each iteration
+    last_unfreeze_layer = 96 #update these with each iteration
+    initial_epochs= 44 #update with each iteration (history.epoch[-1] at end of last iteration)
+    list_of_axvline_values = [19, 26, 37, 44] #update w/ each iteration (append the initial_epoch)
+
+    optimizer = tf.keras.optimizers.Adam(lr=0.0001, beta_1 = 0.9, beta_2 = 0.999)
+    callbacks = [tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3,verbose=1),
                 tf.keras.callbacks.ModelCheckpoint(filepath=f'saved_models/best_transfer_model_{unfreeze_layer}.hdf5',
                                         verbose=1, save_best_only=True, monitor='val_loss')]
 
@@ -269,3 +271,23 @@ if __name__ == "__main__":
 
 
 
+    # #OPEN A SAVED MODEL PATH
+    # saved_model_path = f"./saved_models/best_transfer_model_{unfreeze_layer}.hdf5"
+    # model = tf.keras.models.load_model(saved_model_path)
+    # print(new_model.summary())
+
+    # #EVALUATE MODEL ON TEST SET
+    # test_loss, test_accuracy = model.evaluate(test_generator, verbose=2)
+    # print(f"test_loss = {test_loss}, test_accuracy = {test_accuracy}")
+    # y_probas = model.predict(test_generator)
+    # y_preds = np.argmax(y_probas, axis=1)
+    # y_actual = test_generator.classes
+
+    # #compute confusion matrix
+    # cm = confusion_matrix(y_actual, y_preds)
+    # np.set_printoptions(precision=2)
+
+    # #plot confusion matrix
+    # class_names = ['bass', 'brass', 'flute', 'guitar', 'keyboard', 'mallet',
+    #                 'organ', 'reed', 'string', 'synth_lead', 'vocal']
+    # plot_confusion_matrix(cm, classes=class_names, title='Confusion Matrix', image_name='trial13')

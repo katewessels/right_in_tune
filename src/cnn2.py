@@ -42,8 +42,8 @@ from plot_models import plot_learning_curves, plot_confusion_matrix
 # Image Data Generators
 #params
 batch_size = 32
-img_height = 180
-img_width = 180
+img_height = 64
+img_width = 64
 
 #train set
 train_data_dir = pathlib.Path('data/nsynth-train/train_images')
@@ -84,7 +84,7 @@ test_generator = test_gen.flow_from_directory(
             directory=test_data_dir,
             seed=12,
             subset='validation',
-            color_mode='rgb', #just uncommented this
+            color_mode='rgb',
             target_size=(img_height, img_width),
             batch_size=1,
             shuffle=False,
@@ -100,43 +100,38 @@ num_channels = 3
 #architecture 2
 model = Sequential()
 model.add(Conv2D(32, (3, 3), padding='same',
-                input_shape=(img_height, img_width, num_channels)))
-model.add(Activation('relu'))
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
+                input_shape=(img_height, img_width, num_channels), activation='relu'))
+model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.25))
-model.add(Conv2D(64, (3, 3), padding='same'))
-model.add(Activation('relu'))
-model.add(Conv2D(64, (3, 3)))
-model.add(Activation('relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.5))
-model.add(Conv2D(128, (3, 3), padding='same'))
-model.add(Activation('relu'))
-model.add(Conv2D(128, (3, 3)))
-model.add(Activation('relu'))
+model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(128, (3, 3), activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 model.add(Dropout(0.5))
 model.add(Flatten())
-model.add(Dense(512))
-model.add(Activation('relu'))
+model.add(Dense(512,activation='relu'))
 model.add(Dropout(0.5))
 model.add(Dense(num_classes, activation='softmax'))
 
 
 #train model
-optimizer = tf.keras.optimizers.Adam(lr=0.0001, beta_1 = 0.9, beta_2 = 0.999)
+optimizer = tf.keras.optimizers.Adam(lr=0.001, beta_1 = 0.9, beta_2 = 0.999)
 
 model.compile(optimizer=optimizer,
               loss=tf.losses.SparseCategoricalCrossentropy(),
               metrics=['accuracy'])
 
+print(model.summary())
+
+# Stop training when `val_loss` is no longer improving
 callbacks = [
     tf.keras.callbacks.EarlyStopping(
-            # Stop training when `val_loss` is no longer improving
             monitor="val_loss",
-            patience=20,
+            patience=10,
             verbose=1
             )]
 
@@ -144,14 +139,13 @@ history = model.fit(
             train_generator,
             validation_data=valid_generator,
             epochs=100,
-            verbose=2 #,
+            verbose=2
             # callbacks=callbacks
             )
 
-print(model.summary())
 
 #save model to an HDF5 file
-saved_model_path = "./saved_models/cnn_arc2_13.h5".format(datetime.now().strftime("%m%d")) # _%H%M%S
+saved_model_path = "./saved_models/cnn_arc2_13.h5"
 model.save(saved_model_path)
 
 # #to open a saved model
@@ -178,4 +172,4 @@ np.set_printoptions(precision=2)
 #plot confusion matrix
 class_names = ['bass', 'brass', 'flute', 'guitar', 'keyboard', 'mallet',
                 'organ', 'reed', 'string', 'synth_lead', 'vocal']
-plot_confusion_matrix(cm, classes=class_names, title='Confusion Matrix', image_name='trial13')
+plot_confusion_matrix(cm, classes=class_names, model_name = 'trial13', title='Confusion Matrix')

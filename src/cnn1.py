@@ -84,7 +84,7 @@ test_generator = test_gen.flow_from_directory(
             directory=test_data_dir,
             seed=12,
             subset='validation',
-            color_mode='rgb', #just uncommented this
+            color_mode='rgb',
             target_size=(img_height, img_width),
             batch_size=1,
             shuffle=False,
@@ -143,7 +143,7 @@ history = model.fit(
 print(model.summary())
 
 #save model to an HDF5 file
-saved_model_path = "./saved_models/cnn_arc1_13.h5".format(datetime.now().strftime("%m%d")) # _%H%M%S
+saved_model_path = "./saved_models/cnn_arc1_13.h5"
 model.save(saved_model_path)
 
 # #to open a saved model
