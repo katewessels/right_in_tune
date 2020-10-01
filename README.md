@@ -31,7 +31,7 @@ Python's librosa module makes it very easy to extract and visualize various feat
 
 <img align='center' src="images/class_melspecs.png" width="1200" hspace="100"/>
 
-The last audio feature I looked at was Mel-frequency cepstral coefficients (MFCCs). A cepstral representation of an audio sample is a nonlinear "spectrum-of-a-spectrum" (hence the backwards name!), and is just one more unique way to represent the spectrum of a sound. A mel-frequency cepstrum (MFC) is a representation of that spectrum that is based on a linear cosine transform of a log power spectrum on a nonlinear mel-scale of frequency. Remember that the frequency bands on mel-scale approximate human audio processing more closely than other spaced freqency bands (such as linear), and that is why it is useful! And lastly, MFCCs are just the coefficients that collectively make up that MFC.  
+The last audio feature I looked at was mel-frequency cepstral coefficients (MFCCs). A cepstral representation of an audio sample is a nonlinear "spectrum-of-a-spectrum" (hence the backwards name!), and is just one more unique way to represent the spectrum of a sound. A mel-frequency cepstrum (MFC) is a representation of that spectrum that is based on a linear cosine transform of a log power spectrum on a nonlinear mel-scale of frequency. Remember that the frequency bands on mel-scale approximate human audio processing more closely than other spaced freqency bands (such as linear), and that is why it is useful! And lastly, MFCCs are just the coefficients, with each cofficient corresponding to a range of mel frequencies, that collectively make up that MFC.  
 
 The plots below show examples of frequency intensity displays over time of the cepstral coefficients on a modified (mel) frequency scale. 
 
@@ -45,7 +45,7 @@ The plots below show examples of frequency intensity displays over time of the c
 ### Image Processing: 
 - Created MFCC plots for all audio samples, saving each as an image
 - Restructured image files into class folders, each with 2,000 images, in order to balance classes
-- Used tensorflow "flow from directory" to get labeled MFCC image data, labeled by class, as a generator object
+- Used TensorFlow "flow from directory" to get labeled MFCC image data, labeled by class, as a generator object
 - Batch size: 32
 - Image size: (180, 180)
 - 3 'rbg' channels (ignored the images' fourth channel: opacity)
@@ -63,7 +63,7 @@ The plots below show examples of frequency intensity displays over time of the c
 - Trainable params: 2,680,139
 - Non-trainable params: 0
 
-<img slign='center' src="images/Screen Shot 2020-09-22 at 1.59.37 AM.png" width="500" /> 
+<img slign='center' src="images/cnn_12_architecture.png" width="500" /> 
 
 #### Results:
 - Train Loss: 0.82, Train Accuracy: 0.71
@@ -111,7 +111,7 @@ The plots below show examples of frequency intensity displays over time of the c
 - Weighted Average Recall: 0.94
 
 
-<img align='center' src="images/confusion_matrix_rf_model.png" width="550" />
+<img align='center' src="images/confusion_matrix_rf_normalized.png" width="550" />
 
 <img align='center' src="images/fraction_misclassified.png" width="500"  />
 
@@ -129,11 +129,10 @@ The plots below show examples of frequency intensity displays over time of the c
 
 ## Next Steps
 #### Improve model accuracy
-- Train a CNN with all audio data as images - use keras weighting feature to account for unbalanced classes
-- Try to increase accuracy in Random Forest Model with hyperparameter tuning through a gridsearch
-- Train other classifier models based on MFCC coefficients and an over- or under- sampling technique
+- Train and optimize other models based on MFCC feature matrix
+- Train a CNN with all ~300,000 MFCC images, using keras weighting feature to account for unbalanced classes
 
 #### Extend scope of the project
 - Build a model to predict other features from the audio samples, like pitch or source
-- Build a model to extract instrument and pitch from more complex audio samples, including multiple instruments playing together 
+- Build a model to predict features from more complex audio samples, such as those with multiple instruments playing at the same time
 
